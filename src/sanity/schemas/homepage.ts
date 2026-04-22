@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { bodyField } from './page'
 
 export const homepageType = defineType({
   name: 'homepage',
@@ -6,6 +7,7 @@ export const homepageType = defineType({
   type: 'document',
   groups: [
     { name: 'hero', title: 'Hero' },
+    { name: 'content', title: 'Indhold' },
     { name: 'howitworks', title: 'Sådan beregner vi' },
     { name: 'seo', title: 'SEO' },
   ],
@@ -73,6 +75,9 @@ export const homepageType = defineType({
         { _type: 'howItem', icon: '🔌', title: '+ Faste afgifter', description: 'Netselskab (N1 eller Radius), Energinet-tarif og statens afgifter.' },
       ],
     }),
+
+    // Body content (renders below the comparison table)
+    { ...bodyField, group: 'content' } as any,
 
     // SEO
     defineField({ name: 'metaTitle', title: 'Meta titel', type: 'string', group: 'seo', initialValue: 'Sammenlign elselskaber — find den billigste el i Danmark' }),

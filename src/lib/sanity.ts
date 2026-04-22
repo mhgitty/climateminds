@@ -59,7 +59,7 @@ export async function getElselskaber() {
 export async function getHomepage() {
   return client.fetch(
     `*[_type == "homepage" && _id == "homepage"][0] {
-      heroHeading, heroGreenText, intro,
+      heroHeading, heroGreenText, intro, body,
       howItWorksTitle, showHowItWorks, howItWorksItems,
       metaTitle, metaDescription
     }`

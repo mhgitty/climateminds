@@ -2,6 +2,7 @@ import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { PostCard } from '@/components/PostCard'
 import ElselskabCompare from '@/components/ElselskabCompare'
+import { PortableTextRenderer } from '@/components/PortableTextRenderer'
 import { getElPriserData } from '@/lib/elpriser'
 import { getPosts, getElselskaber, getHomepage } from '@/lib/sanity'
 import type { Metadata } from 'next'
@@ -107,6 +108,13 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+      )}
+
+      {/* Page body content */}
+      {hp?.body && (
+        <div className="section-narrow" style={{ paddingTop: '48px', paddingBottom: '0' }}>
+          <PortableTextRenderer value={hp.body} posts={posts as any} />
+        </div>
       )}
 
       {/* Latest articles */}
