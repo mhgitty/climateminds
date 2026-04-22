@@ -1,0 +1,413 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Variables ──────────────────────────────────────────────────────────── */
+:root {
+  --green: #16a34a;
+  --green-dark: #15803d;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ─── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow-x: clip; }
+
+body {
+  background: #f9fafb;
+  color: #111827;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 15px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #111827;
+}
+
+/* ─── Layout helpers ─────────────────────────────────────────────────────── */
+.section         { max-width: 1200px; margin: 0 auto; padding: 48px 24px; }
+.section-narrow  { max-width: 760px;  margin: 0 auto; padding: 48px 24px; }
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f3f4f6; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+
+/* ─── Range input ────────────────────────────────────────────────────────── */
+input[type='range'] {
+  -webkit-appearance: none;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  outline: none;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  background: #16a34a;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+/* ─── Navbar ─────────────────────────────────────────────────────────────── */
+.navbar {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.navbar-logo {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.navbar-logo-icon {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.navbar-logo-text {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.nav-link {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 400;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.nav-link-cta {
+  background: #16a34a;
+  color: #fff !important;
+  font-weight: 500;
+  padding: 8px 14px;
+  margin-left: 4px;
+}
+
+/* ─── Hero ───────────────────────────────────────────────────────────────── */
+.hero-section {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 48px 24px 40px;
+}
+.hero-heading {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5vw, 52px);
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  max-width: 700px;
+}
+.hero-subtext {
+  font-size: 16px;
+  color: #6b7280;
+  max-width: 560px;
+  line-height: 1.7;
+}
+
+/* ─── "How it works" grid ────────────────────────────────────────────────── */
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* ─── Blog grid ──────────────────────────────────────────────────────────── */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* ─── Footer grid ────────────────────────────────────────────────────────── */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+/* ─── Comparison filter bar ──────────────────────────────────────────────── */
+.elcomp-filters {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.elcomp-filter-group {
+  flex-shrink: 0;
+}
+.elcomp-filter-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.elcomp-slider-wrap {
+  flex: 1;
+  min-width: 180px;
+}
+.elcomp-area-btn {
+  padding: 7px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  background: transparent;
+  color: #6b7280;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.elcomp-area-btn.is-active {
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ─── Comparison card ────────────────────────────────────────────────────── */
+.elcard-row {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  position: relative;
+}
+.elcard-cheapest-badge {
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  background: #16a34a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+.elcard-logo-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Mobile inline logo — hidden on desktop, shown on mobile */
+.elcard-mobile-logo {
+  display: none;
+}
+.elcard-info-col {
+  min-width: 0;
+}
+.elcard-tags {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.elcard-price-col {
+  text-align: right;
+  min-width: 150px;
+  flex-shrink: 0;
+}
+.elcard-tooltip-trigger {
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  width: 18px; height: 18px;
+  font-size: 10px;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 0;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.elcard-cta {
+  display: inline-block;
+  background: #f3f4f6;
+  color: #374151;
+  padding: 10px 18px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+.elcard-cta.is-cheapest {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+}
+.elcard-tooltip {
+  position: absolute;
+  right: 24px;
+  top: calc(100% + 8px);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  padding: 16px 20px;
+  z-index: 10;
+  min-width: 260px;
+  text-align: left;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE — ≤ 768px
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Section padding */
+  .section, .section-narrow { padding: 28px 16px; }
+
+  /* Hero */
+  .hero-section { padding: 32px 16px 28px; }
+  .hero-subtext  { font-size: 15px; }
+
+  /* Navbar — hide "Se alle selskaber" CTA, tighten spacing */
+  .navbar-inner  { padding: 0 16px; height: 52px; }
+  .navbar-logo-text { font-size: 16px; }
+  .nav-link-cta  { display: none; }
+  .nav-link      { font-size: 13.5px; padding: 6px 8px; }
+
+  /* How-it-works */
+  .how-grid { grid-template-columns: 1fr; gap: 12px; }
+
+  /* Blog grid */
+  .blog-grid { grid-template-columns: 1fr; }
+
+  /* Footer */
+  .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+
+  /* ── Filter bar ── */
+  .elcomp-filters {
+    flex-direction: column;
+    gap: 16px;
+    padding: 14px 16px;
+  }
+  .elcomp-filter-group { width: 100%; }
+  .elcomp-slider-wrap  { width: 100%; min-width: 0; }
+
+  /* ── Comparison card — stack logo + name + price vertically ── */
+  .elcard-row {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  /* On mobile: hide the separate logo column, show inline logo inside info */
+  .elcard-logo-col {
+    display: none;
+  }
+
+  /* Show the inline mobile logo above the provider name */
+  .elcard-mobile-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .elcard-price-col {
+    text-align: left;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 12px;
+  }
+
+  /* Price number stays big but left-aligned */
+  .elcard-price-col > div:first-child {
+    justify-content: flex-start;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Monthly estimate inline with price */
+  .elcard-price-col > div:nth-child(2) {
+    display: none; /* hide on very small screens — shown in tooltip */
+  }
+
+  /* CTA button full width */
+  .elcard-cta {
+    width: 100%;
+    text-align: center;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  /* Tooltip: full width, position below trigger */
+  .elcard-tooltip {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    top: auto;
+    min-width: 0;
+    border-radius: 14px;
+    box-shadow: 0 -4px 32px rgba(0,0,0,0.15);
+  }
+
+  .elcard-tags { gap: 6px; }
+  .elcard-cheapest-badge { font-size: 10px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TABLET — 769px – 1024px
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .how-grid  { grid-template-columns: repeat(2, 1fr); }
+  .blog-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+
+  .elcard-row { grid-template-columns: 90px 1fr auto; gap: 12px; }
+  .elcard-price-col { min-width: 130px; }
+  .elcard-cta { padding: 9px 14px; font-size: 13px; }
+
+  .nav-link-cta { display: none; }
+}
