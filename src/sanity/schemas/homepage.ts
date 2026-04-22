@@ -28,11 +28,12 @@ export const homepageType = defineType({
       initialValue: 'i Danmark',
     }),
     defineField({
-      name: 'heroSubtext',
-      title: 'Hero underoverskrift',
+      name: 'intro',
+      title: 'Intro',
       type: 'text',
       rows: 3,
       group: 'hero',
+      description: 'Kort tekst der vises under overskriften i hero-sektionen',
       initialValue: 'Vi beregner den reelle pris pr. kWh for alle store elselskaber baseret på den aktuelle spotpris. Juster dit forbrug og find det tilbud, der passer til dig.',
     }),
 

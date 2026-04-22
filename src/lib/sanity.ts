@@ -42,7 +42,7 @@ export async function getCategories() {
 export async function getPageBySlug(slug: string) {
   return client.fetch(
     `*[_type == "page" && slug.current == $slug][0] {
-      _id, title, slug, body, metaTitle, metaDescription
+      _id, title, slug, intro, body, metaTitle, metaDescription
     }`,
     { slug }
   )
@@ -59,7 +59,7 @@ export async function getElselskaber() {
 export async function getHomepage() {
   return client.fetch(
     `*[_type == "homepage" && _id == "homepage"][0] {
-      heroHeading, heroGreenText, heroSubtext,
+      heroHeading, heroGreenText, intro,
       howItWorksTitle, showHowItWorks, howItWorksItems,
       metaTitle, metaDescription
     }`

@@ -1,5 +1,6 @@
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
+import { HeroSection } from '@/components/HeroSection'
 import { PortableTextRenderer } from '@/components/PortableTextRenderer'
 import { getPageBySlug } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
@@ -15,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!page) return {}
   return {
     title: page.metaTitle || page.title,
-    description: page.metaDescription || '',
+    description: page.metaDescription || page.intro || '',
     alternates: { canonical: `https://climateminds.dk/${slug}` },
   }
 }
@@ -28,13 +29,7 @@ export default async function DynamicPage({ params }: Props) {
   return (
     <>
       <Navbar />
-      <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '40px 24px 32px' }}>
-        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, color: '#111827', lineHeight: 1.2, letterSpacing: '-0.03em' }}>
-            {page.title}
-          </h1>
-        </div>
-      </div>
+      <HeroSection title={page.title} intro={page.intro} narrow />
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '40px 24px 80px' }}>
         {page.body && <PortableTextRenderer value={page.body} />}
       </div>

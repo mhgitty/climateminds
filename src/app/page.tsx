@@ -10,7 +10,7 @@ export const revalidate = 1800
 
 const DEFAULT_HERO_HEADING = 'Find den billigste el'
 const DEFAULT_HERO_GREEN = 'i Danmark'
-const DEFAULT_HERO_SUBTEXT = 'Vi beregner den reelle pris pr. kWh for alle store elselskaber baseret på den aktuelle spotpris. Juster dit forbrug og find det tilbud, der passer til dig.'
+const DEFAULT_INTRO = 'Vi beregner den reelle pris pr. kWh for alle store elselskaber baseret på den aktuelle spotpris. Juster dit forbrug og find det tilbud, der passer til dig.'
 const DEFAULT_HOW_TITLE = 'Sådan beregner vi prisen'
 const DEFAULT_HOW_ITEMS = [
   { icon: '⚡', title: 'Rå spotpris', description: 'Gennemsnittet for seneste måned fra energidataservice.dk — opdateres automatisk.' },
@@ -47,7 +47,7 @@ export default async function HomePage() {
 
   const heroHeading = hp?.heroHeading || DEFAULT_HERO_HEADING
   const heroGreen   = hp?.heroGreenText || DEFAULT_HERO_GREEN
-  const heroSubtext = hp?.heroSubtext || DEFAULT_HERO_SUBTEXT
+  const heroSubtext = hp?.intro || DEFAULT_INTRO
   const showHow     = hp?.showHowItWorks !== false
   const howTitle    = hp?.howItWorksTitle || DEFAULT_HOW_TITLE
   const howItems    = (hp?.howItWorksItems?.length ? hp.howItWorksItems : DEFAULT_HOW_ITEMS) as typeof DEFAULT_HOW_ITEMS

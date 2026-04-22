@@ -35,6 +35,10 @@ export const elselskabType = defineType({
       description: 'Link til tilmeldingsside (med evt. affiliate-parameter)',
     }),
     defineField({
+      name: 'intro', title: 'Intro', type: 'text', rows: 3, group: 'info',
+      description: 'Kort tekst der vises under selskabsnavnet i hero-sektionen på selskabets side',
+    }),
+    defineField({
       name: 'shortDescription', title: 'Kort beskrivelse', type: 'text', rows: 2, group: 'info',
       description: 'Vises under selskabsnavnet i tabellen',
     }),
