@@ -28,47 +28,74 @@ function calcPrice(p: any, rawPrice: number, common: any, annualKwh: number) {
 }
 
 /* ── Live prices modal ── */
-function LivePricesModal({ area, providerName, onClose }: { area: string; providerName: string; onClose: () => void }) {
+function LivePricesModal({
+  ctaSlug, area, apiData, onClose,
+}: {
+  ctaSlug: string
+  area: string
+  apiData: any
+  onClose: () => void
+}) {
   const [hours, setHours] = useState<{ hour: number; price: number }[] | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // Find the cheapest product from this company
+  const rawPrice: number = area === 'DK2' ? apiData.rawDk2 : apiData.rawDk1
+  const common = area === 'DK2' ? apiData.commonDk2 : apiData.commonDk1
+  const primaryProvider = apiData.providers?.find((p: any) => p.ctaSlug === ctaSlug)
+  const companyName: string = primaryProvider?.name ?? ''
+
+  // All products from same company (same column A name), pick cheapest at 4000 kWh
+  const sameCompany: any[] = apiData.providers?.filter((p: any) => p.name === companyName) ?? [primaryProvider]
+  const cheapest = sameCompany.reduce((best: any, p: any) => {
+    if (!best) return p
+    const totalP = rawPrice + p.kwhTillaeg + (p.aboMonthly * 12) / 4000 + common.netselskab + common.energinet + common.staten
+    const totalB = rawPrice + best.kwhTillaeg + (best.aboMonthly * 12) / 4000 + common.netselskab + common.energinet + common.staten
+    return totalP < totalB ? p : best
+  }, primaryProvider)
+
+  const aboPerKwh = cheapest ? (cheapest.aboMonthly * 12) / 4000 : 0
+
   useEffect(() => {
     const priceArea = area === 'DK2' ? 'DK2' : 'DK1'
-    // Use Danish timezone for the date so midnight CET/CEST is correct
     const todayDK = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Copenhagen' })
     const tomorrowDK = new Date(Date.now() + 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Copenhagen' })
     const filter = encodeURIComponent(JSON.stringify({ PriceArea: priceArea }))
 
-    const parseRecords = (records: any[]) =>
+    // Convert raw spot price (DKK/MWh) → full consumer price (kr./kWh)
+    const buildRows = (records: any[]) =>
       records
-        .map((r: any) => ({
-          hour: new Date(r.HourDK).getHours(),
-          price: Math.max((r.SpotPriceDKK / 1000) * 1.25, 0),
-        }))
+        .map((r: any) => {
+          const spot = r.SpotPriceDKK / 1000
+          const total = Math.max(
+            spot + (cheapest?.kwhTillaeg ?? 0) + aboPerKwh + common.netselskab + common.energinet + common.staten,
+            0
+          )
+          return { hour: new Date(r.HourDK).getHours(), price: total }
+        })
         .sort((a, b) => a.hour - b.hour)
 
-    // Primary: fetch today by Danish date
     fetch(`https://api.energidataservice.dk/dataset/Elspotprices?start=${todayDK}&end=${tomorrowDK}&filter=${filter}&sort=HourDK%20ASC&limit=24`)
       .then((r) => r.json())
       .then(async (data) => {
         const records = data.records ?? []
-        if (records.length > 0) return parseRecords(records)
-
-        // Fallback: get most recent 48 records and pick the latest date's batch
+        if (records.length > 0) return buildRows(records)
+        // Fallback: most recent 48 records, pick latest day
         const fb = await fetch(`https://api.energidataservice.dk/dataset/Elspotprices?filter=${filter}&sort=HourDK%20DESC&limit=48`)
         const fbData = await fb.json()
         const fbRecords: any[] = fbData.records ?? []
         if (!fbRecords.length) return []
         const latestDate = fbRecords[0].HourDK?.slice(0, 10)
-        return parseRecords(fbRecords.filter((r: any) => r.HourDK?.startsWith(latestDate)))
+        return buildRows(fbRecords.filter((r: any) => r.HourDK?.startsWith(latestDate)))
       })
       .then(setHours)
       .catch(() => setHours([]))
       .finally(() => setLoading(false))
-  }, [area])
+  }, [area, ctaSlug])
 
   const now = parseInt(new Date().toLocaleTimeString('da-DK', { timeZone: 'Europe/Copenhagen', hour: '2-digit', hour12: false }), 10)
   const maxPrice = hours ? Math.max(...hours.map((h) => h.price), 0.01) : 1
+  const providerName = companyName || ctaSlug
 
   const barColor = (price: number) => {
     const ratio = price / maxPrice
@@ -91,10 +118,10 @@ function LivePricesModal({ area, providerName, onClose }: { area: string; provid
         <button onClick={onClose} style={{ position: 'absolute', top: '16px', right: '18px', background: 'none', border: 'none', fontSize: '22px', cursor: 'pointer', color: '#9ca3af' }}>×</button>
 
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '17px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>
-          Live spotpris — {providerName}
+          Live timepris — {providerName}
         </div>
         <div style={{ fontSize: '12.5px', color: '#9ca3af', marginBottom: '24px' }}>
-          {area} · Dagens timepriser inkl. moms · Kilde: energidataservice.dk
+          {area} · Samlet pris inkl. tillæg, abonnement &amp; afgifter · Kilde: energidataservice.dk
         </div>
 
         {loading && (
@@ -157,7 +184,7 @@ function LivePricesModal({ area, providerName, onClose }: { area: string; provid
               <span><span style={{ color: '#16a34a', fontWeight: 700 }}>●</span> Lav</span>
               <span><span style={{ color: '#f59e0b', fontWeight: 700 }}>●</span> Middel</span>
               <span><span style={{ color: '#ef4444', fontWeight: 700 }}>●</span> Høj</span>
-              <span style={{ marginLeft: 'auto', fontSize: '10.5px', color: '#d1d5db' }}>Priser er spotpriser ekskl. elselskabets tillæg</span>
+              <span style={{ marginLeft: 'auto', fontSize: '10.5px', color: '#d1d5db' }}>Billigste produkt fra {providerName} inkl. alle afgifter</span>
             </div>
           </>
         )}
@@ -211,10 +238,11 @@ export function ProviderPriceBlock({ value }: Props) {
 
   return (
     <>
-      {showModal && (
+      {showModal && apiData && (
         <LivePricesModal
+          ctaSlug={ctaSlug}
           area={area}
-          providerName={primaryProvider?.title || primaryProvider?.name || ctaSlug}
+          apiData={apiData}
           onClose={closeModal}
         />
       )}
@@ -381,13 +409,13 @@ export function ProviderPriceBlock({ value }: Props) {
           {reviewSlug && (
             <a href={`/${reviewSlug}`}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f9fafb', color: '#374151', border: '1px solid #e5e7eb', padding: '9px 16px', borderRadius: '8px', fontSize: '13.5px', fontWeight: 500, textDecoration: 'none' }}>
-              📝 Læs anmeldelse af {primaryProvider?.title || primaryProvider?.name || ctaSlug}
+              📝 Læs anmeldelse af {primaryProvider?.name || ctaSlug}
             </a>
           )}
           <button
             onClick={() => setShowModal(true)}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', padding: '9px 16px', borderRadius: '8px', fontSize: '13.5px', fontWeight: 500, cursor: 'pointer' }}>
-            ⚡ Se {primaryProvider?.title || primaryProvider?.name || ctaSlug} live timepris
+            ⚡ Se {primaryProvider?.name || ctaSlug} live timepris
           </button>
         </div>
       </div>
