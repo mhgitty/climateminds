@@ -138,49 +138,80 @@ function LivePricesModal({
 
         {!loading && hours && hours.length > 0 && (
           <>
-            {/* Bar chart */}
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '140px', marginBottom: '8px' }}>
+            {/* ── Desktop: vertical bar chart ── */}
+            <div className="live-price-desktop">
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '140px', marginBottom: '8px' }}>
+                {hours.map((h) => {
+                  const heightPct = Math.max((h.price / maxPrice) * 100, 4)
+                  const isNow = h.hour === now
+                  return (
+                    <div key={h.hour} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end' }}>
+                      <div title={`kl. ${String(h.hour).padStart(2, '0')}:00 — ${fmtDK(h.price, 2)} kr./kWh`} style={{
+                        width: '100%', height: `${heightPct}%`,
+                        background: barColor(h.price),
+                        borderRadius: '3px 3px 0 0',
+                        opacity: isNow ? 1 : 0.75,
+                        outline: isNow ? '2px solid #111827' : 'none',
+                        outlineOffset: '1px',
+                      }} />
+                    </div>
+                  )
+                })}
+              </div>
+              <div style={{ display: 'flex', gap: '3px', marginBottom: '4px' }}>
+                {hours.map((h) => (
+                  <div key={h.hour} style={{ flex: 1, textAlign: 'center', fontSize: '9px', color: h.hour === now ? '#111827' : '#9ca3af', fontWeight: h.hour === now ? 700 : 400 }}>
+                    {String(h.hour).padStart(2, '0')}
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: '3px', marginBottom: '16px' }}>
+                {hours.map((h) => (
+                  <div key={h.hour} style={{ flex: 1, textAlign: 'center', fontSize: '8.5px', color: h.hour === now ? '#111827' : '#9ca3af', fontWeight: h.hour === now ? 700 : 400 }}>
+                    {fmtDK(h.price, 2)}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Mobile: horizontal list ── */}
+            <div className="live-price-mobile">
               {hours.map((h) => {
-                const heightPct = Math.max((h.price / maxPrice) * 100, 4)
+                const widthPct = Math.max((h.price / maxPrice) * 100, 3)
                 const isNow = h.hour === now
                 return (
-                  <div key={h.hour} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', height: '100%', justifyContent: 'flex-end' }}>
-                    <div title={`kl. ${String(h.hour).padStart(2, '0')}:00 — ${fmtDK(h.price, 2)} kr./kWh`} style={{
-                      width: '100%',
-                      height: `${heightPct}%`,
-                      background: barColor(h.price),
-                      borderRadius: '3px 3px 0 0',
-                      opacity: isNow ? 1 : 0.75,
-                      outline: isNow ? '2px solid #111827' : 'none',
-                      outlineOffset: '1px',
-                      cursor: 'default',
-                      transition: 'opacity 0.1s',
-                    }} />
+                  <div key={h.hour} style={{
+                    display: 'grid',
+                    gridTemplateColumns: '44px 64px 1fr',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '6px 0',
+                    borderBottom: '1px solid #f9fafb',
+                    background: isNow ? '#f0fdf4' : 'transparent',
+                    borderRadius: isNow ? '6px' : '0',
+                    paddingLeft: isNow ? '6px' : '0',
+                  }}>
+                    <span style={{ fontSize: '12.5px', color: isNow ? '#111827' : '#6b7280', fontWeight: isNow ? 700 : 400 }}>
+                      kl. {String(h.hour).padStart(2, '0')}
+                    </span>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: barColor(h.price), fontFamily: 'var(--font-display)' }}>
+                      {fmtDK(h.price, 2)} kr.
+                    </span>
+                    <div style={{ background: '#f3f4f6', borderRadius: '3px', height: '8px', overflow: 'hidden' }}>
+                      <div style={{
+                        width: `${widthPct}%`, height: '100%',
+                        background: barColor(h.price),
+                        borderRadius: '3px',
+                        transition: 'width 0.3s',
+                      }} />
+                    </div>
                   </div>
                 )
               })}
             </div>
 
-            {/* Hour labels */}
-            <div style={{ display: 'flex', gap: '3px' }}>
-              {hours.map((h) => (
-                <div key={h.hour} style={{ flex: 1, textAlign: 'center', fontSize: '9px', color: h.hour === now ? '#111827' : '#9ca3af', fontWeight: h.hour === now ? 700 : 400 }}>
-                  {String(h.hour).padStart(2, '0')}
-                </div>
-              ))}
-            </div>
-
-            {/* Price labels */}
-            <div style={{ display: 'flex', gap: '3px', marginTop: '3px', marginBottom: '16px' }}>
-              {hours.map((h) => (
-                <div key={h.hour} style={{ flex: 1, textAlign: 'center', fontSize: '8.5px', color: h.hour === now ? '#111827' : '#9ca3af', fontWeight: h.hour === now ? 700 : 400 }}>
-                  {fmtDK(h.price, 2)}
-                </div>
-              ))}
-            </div>
-
             {/* Legend */}
-            <div style={{ display: 'flex', gap: '16px', fontSize: '11.5px', color: '#6b7280' }}>
+            <div style={{ display: 'flex', gap: '16px', fontSize: '11.5px', color: '#6b7280', marginTop: '16px' }}>
               <span><span style={{ color: '#16a34a', fontWeight: 700 }}>●</span> Lav</span>
               <span><span style={{ color: '#f59e0b', fontWeight: 700 }}>●</span> Middel</span>
               <span><span style={{ color: '#ef4444', fontWeight: 700 }}>●</span> Høj</span>

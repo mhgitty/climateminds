@@ -295,6 +295,10 @@ input[type='range']::-webkit-slider-thumb {
   text-align: left;
 }
 
+/* ─── Live price chart layouts ──────────────────────────────────────────── */
+.live-price-desktop { display: block; }
+.live-price-mobile  { display: none; }
+
 /* ─── Provider offer row (inside ProviderPriceBlock) ────────────────────── */
 .provider-offer-row {
   display: grid;
@@ -408,6 +412,10 @@ input[type='range']::-webkit-slider-thumb {
 
   .elcard-tags { gap: 6px; }
   .elcard-cheapest-badge { font-size: 10px; }
+
+  /* Live price chart — switch to list on mobile */
+  .live-price-desktop { display: none; }
+  .live-price-mobile  { display: block; }
 
   /* Provider offer row — stack on mobile */
   .provider-offer-row {
