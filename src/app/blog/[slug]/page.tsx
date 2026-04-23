@@ -37,7 +37,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       {/* Hero header */}
       <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '40px 24px 32px' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1080px', margin: '0 auto' }}>
           <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '20px' }}>
             <a href="/" style={{ color: '#9ca3af', textDecoration: 'none' }}>Hjem</a>
             <span style={{ margin: '0 6px' }}>›</span>

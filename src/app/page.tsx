@@ -3,6 +3,7 @@ import { Footer } from '@/components/Footer'
 import { PostCard } from '@/components/PostCard'
 import ElselskabCompare from '@/components/ElselskabCompare'
 import { PortableTextRenderer } from '@/components/PortableTextRenderer'
+import { TableOfContents } from '@/components/TableOfContents'
 import { getElPriserData } from '@/lib/elpriser'
 import { getPosts, getElselskaber, getHomepage } from '@/lib/sanity'
 import type { Metadata } from 'next'
@@ -110,10 +111,15 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Page body content */}
+      {/* Page body content with sticky TOC sidebar */}
       {hp?.body && (
-        <div className="section-narrow" style={{ paddingTop: '48px', paddingBottom: '0' }}>
-          <PortableTextRenderer value={hp.body} posts={posts as any} />
+        <div className="article-layout" style={{ paddingBottom: '0' }}>
+          <div className="article-content">
+            <PortableTextRenderer value={hp.body} posts={posts as any} />
+          </div>
+          <aside className="toc-sidebar">
+            <TableOfContents body={hp.body} />
+          </aside>
         </div>
       )}
 
