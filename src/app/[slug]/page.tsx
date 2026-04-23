@@ -2,6 +2,7 @@ import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { HeroSection } from '@/components/HeroSection'
 import { PortableTextRenderer } from '@/components/PortableTextRenderer'
+import { TableOfContents } from '@/components/TableOfContents'
 import { getPageBySlug } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
@@ -29,10 +30,20 @@ export default async function DynamicPage({ params }: Props) {
   return (
     <>
       <Navbar />
-      <HeroSection title={page.title} intro={page.intro} narrow />
-      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '40px 24px 80px' }}>
-        {page.body && <PortableTextRenderer value={page.body} />}
+      <HeroSection title={page.title} intro={page.intro} />
+
+      <div className="article-layout">
+        <article className="article-content">
+          {page.body && <PortableTextRenderer value={page.body} />}
+        </article>
+
+        {page.body && (
+          <aside className="toc-sidebar">
+            <TableOfContents body={page.body} />
+          </aside>
+        )}
       </div>
+
       <Footer />
     </>
   )
