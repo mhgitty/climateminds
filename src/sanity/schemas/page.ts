@@ -182,16 +182,19 @@ export const bodyField = defineField({
       name: 'providerPriceBlock',
       title: 'Prisboks med udbyder',
       fields: [
+        { name: 'title', title: 'Overskrift (h3)', type: 'string' },
+        { name: 'text', title: 'Tekst', type: 'text', rows: 3 },
+        { name: 'pros', title: 'Fordele ✅', type: 'array', of: [{ type: 'string' }] },
+        { name: 'cons', title: 'Ulemper ❌', type: 'array', of: [{ type: 'string' }] },
         {
-          name: 'title', title: 'Overskrift (h3)', type: 'string',
-        },
-        {
-          name: 'text', title: 'Tekst', type: 'text', rows: 3,
-        },
-        {
-          name: 'ctaSlug', title: 'Udbyder (ctaSlug)', type: 'string',
-          description: 'F.eks. "norlys", "ewii", "evdk" — matcher ctaSlug i Google Sheets',
+          name: 'ctaSlug', title: 'Udbyder til pristabel (ctaSlug)', type: 'string',
+          description: 'Bruges til kWh-pristabellen. F.eks. "norlys"',
           validation: (r: any) => r.required(),
+        },
+        {
+          name: 'offerSlugs', title: 'Tilbud at vise (ctaSlugs)', type: 'array',
+          of: [{ type: 'string' }],
+          description: 'Tilføj én eller flere ctaSlugs for de tilbud der vises i bunden. F.eks. "norlys", "norlys-fastpris"',
         },
         {
           name: 'area', title: 'Priszone', type: 'string',
