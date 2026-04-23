@@ -295,6 +295,19 @@ input[type='range']::-webkit-slider-thumb {
   text-align: left;
 }
 
+/* ─── Provider offer row (inside ProviderPriceBlock) ────────────────────── */
+.provider-offer-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 28px;
+  border-top: 1px solid #f9fafb;
+}
+/* Desktop: show standalone logo col, hide the inline mobile logo */
+.provider-offer-logo        { display: flex; align-items: center; }
+.provider-offer-logo-mobile { display: none; }
+
 /* ═══════════════════════════════════════════════════════════════════════════
    MOBILE — ≤ 768px
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -395,6 +408,16 @@ input[type='range']::-webkit-slider-thumb {
 
   .elcard-tags { gap: 6px; }
   .elcard-cheapest-badge { font-size: 10px; }
+
+  /* Provider offer row — stack on mobile */
+  .provider-offer-row {
+    grid-template-columns: 1fr auto;
+    padding: 16px 20px;
+    gap: 10px;
+  }
+  /* Hide standalone logo col; show inline logo next to name instead */
+  .provider-offer-logo        { display: none; }
+  .provider-offer-logo-mobile { display: inline-block; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

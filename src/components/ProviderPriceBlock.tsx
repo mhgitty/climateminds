@@ -33,27 +33,41 @@ function LivePricesModal({ area, providerName, onClose }: { area: string; provid
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const today = new Date().toISOString().slice(0, 10)
-    const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10)
     const priceArea = area === 'DK2' ? 'DK2' : 'DK1'
-    const url = `https://api.energidataservice.dk/dataset/Elspotprices?start=${today}&end=${tomorrow}&filter=%7B%22PriceArea%22%3A%22${priceArea}%22%7D&sort=HourDK%20ASC&limit=24`
+    // Use Danish timezone for the date so midnight CET/CEST is correct
+    const todayDK = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Copenhagen' })
+    const tomorrowDK = new Date(Date.now() + 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Copenhagen' })
+    const filter = encodeURIComponent(JSON.stringify({ PriceArea: priceArea }))
 
-    fetch(url)
-      .then((r) => r.json())
-      .then((data) => {
-        const records = data.records ?? []
-        const parsed = records.map((r: any) => ({
+    const parseRecords = (records: any[]) =>
+      records
+        .map((r: any) => ({
           hour: new Date(r.HourDK).getHours(),
-          // Convert DKK/MWh → kr./kWh incl. moms
-          price: (r.SpotPriceDKK / 1000) * 1.25,
+          price: Math.max((r.SpotPriceDKK / 1000) * 1.25, 0),
         }))
-        setHours(parsed)
+        .sort((a, b) => a.hour - b.hour)
+
+    // Primary: fetch today by Danish date
+    fetch(`https://api.energidataservice.dk/dataset/Elspotprices?start=${todayDK}&end=${tomorrowDK}&filter=${filter}&sort=HourDK%20ASC&limit=24`)
+      .then((r) => r.json())
+      .then(async (data) => {
+        const records = data.records ?? []
+        if (records.length > 0) return parseRecords(records)
+
+        // Fallback: get most recent 48 records and pick the latest date's batch
+        const fb = await fetch(`https://api.energidataservice.dk/dataset/Elspotprices?filter=${filter}&sort=HourDK%20DESC&limit=48`)
+        const fbData = await fb.json()
+        const fbRecords: any[] = fbData.records ?? []
+        if (!fbRecords.length) return []
+        const latestDate = fbRecords[0].HourDK?.slice(0, 10)
+        return parseRecords(fbRecords.filter((r: any) => r.HourDK?.startsWith(latestDate)))
       })
+      .then(setHours)
       .catch(() => setHours([]))
       .finally(() => setLoading(false))
   }, [area])
 
-  const now = new Date().getHours()
+  const now = parseInt(new Date().toLocaleTimeString('da-DK', { timeZone: 'Europe/Copenhagen', hour: '2-digit', hour12: false }), 10)
   const maxPrice = hours ? Math.max(...hours.map((h) => h.price), 0.01) : 1
 
   const barColor = (price: number) => {
@@ -213,37 +227,35 @@ export function ProviderPriceBlock({ value }: Props) {
         margin: '32px 0',
         boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
       }}>
-        {/* Header — title/text left, logo right */}
-        <div style={{ padding: '28px 28px 0', display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {title && (
-              <h3 style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '20px',
-                fontWeight: 700,
-                color: '#111827',
-                letterSpacing: '-0.02em',
-                marginBottom: text ? '10px' : '20px',
-              }}>
-                {title}
-              </h3>
-            )}
-            {text && (
-              <p style={{ fontSize: '14.5px', color: '#6b7280', lineHeight: 1.7, marginBottom: '20px' }}>
-                {text}
-              </p>
-            )}
-          </div>
-
-          {/* Logo — right side */}
-          {primaryProvider?.logoFile && (
-            <div style={{ flexShrink: 0, padding: '4px 0' }}>
-              <img
-                src={`/logos/${primaryProvider.logoFile}`}
-                alt={primaryProvider.name}
-                style={{ maxWidth: '110px', maxHeight: '48px', objectFit: 'contain', display: 'block' }}
-              />
-            </div>
+        {/* Header — logo inline with title */}
+        <div style={{ padding: '28px 28px 0' }}>
+          {title && (
+            <h3 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '20px',
+              fontWeight: 700,
+              color: '#111827',
+              letterSpacing: '-0.02em',
+              marginBottom: text ? '10px' : '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              flexWrap: 'wrap',
+            }}>
+              {title}
+              {primaryProvider?.logoFile && (
+                <img
+                  src={`/logos/${primaryProvider.logoFile}`}
+                  alt={primaryProvider.name}
+                  style={{ maxHeight: '28px', maxWidth: '90px', objectFit: 'contain', display: 'inline-block', verticalAlign: 'middle' }}
+                />
+              )}
+            </h3>
+          )}
+          {text && (
+            <p style={{ fontSize: '14.5px', color: '#6b7280', lineHeight: 1.7, marginBottom: '20px' }}>
+              {text}
+            </p>
           )}
         </div>
 
@@ -314,15 +326,9 @@ export function ProviderPriceBlock({ value }: Props) {
             Aktuelle tilbud
           </div>
           {offerRows ? offerRows.map((row: any) => (
-            <div key={row.slug} style={{
-              display: 'grid',
-              gridTemplateColumns: '90px 1fr auto',
-              gap: '12px',
-              alignItems: 'center',
-              padding: '14px 28px',
-              borderTop: '1px solid #f9fafb',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div key={row.slug} className="provider-offer-row">
+              {/* Logo — hidden on mobile (merged into info row) */}
+              <div className="provider-offer-logo">
                 {row.p.logoFile ? (
                   <img src={`/logos/${row.p.logoFile}`} alt={row.p.name}
                     style={{ maxWidth: '80px', maxHeight: '36px', objectFit: 'contain' }} />
@@ -331,8 +337,16 @@ export function ProviderPriceBlock({ value }: Props) {
                 )}
               </div>
               <div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '14px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>
-                  {row.p.title || row.p.name}
+                {/* On mobile: logo + name in one flex row */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                  {row.p.logoFile && (
+                    <img src={`/logos/${row.p.logoFile}`} alt={row.p.name}
+                      className="provider-offer-logo-mobile"
+                      style={{ maxWidth: '60px', maxHeight: '28px', objectFit: 'contain' }} />
+                  )}
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: '14px', fontWeight: 700, color: '#111827' }}>
+                    {row.p.title || row.p.name}
+                  </span>
                 </div>
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                   {row.p.introtilbud && (
@@ -367,13 +381,13 @@ export function ProviderPriceBlock({ value }: Props) {
           {reviewSlug && (
             <a href={`/${reviewSlug}`}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f9fafb', color: '#374151', border: '1px solid #e5e7eb', padding: '9px 16px', borderRadius: '8px', fontSize: '13.5px', fontWeight: 500, textDecoration: 'none' }}>
-              📝 Læs vores anmeldelse
+              📝 Læs anmeldelse af {primaryProvider?.title || primaryProvider?.name || ctaSlug}
             </a>
           )}
           <button
             onClick={() => setShowModal(true)}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', padding: '9px 16px', borderRadius: '8px', fontSize: '13.5px', fontWeight: 500, cursor: 'pointer' }}>
-            ⚡ Se live timepriser
+            ⚡ Se {primaryProvider?.title || primaryProvider?.name || ctaSlug} live timepris
           </button>
         </div>
       </div>
