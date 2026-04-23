@@ -5,6 +5,7 @@ import { ProsConsBlock } from './ProsConsBlock'
 import { LatestPostsBlock } from './LatestPostsBlock'
 import { ElPrisInline } from './ElPrisInline'
 import { ElselskabShortcode } from './ElselskabShortcode'
+import { ProviderPriceBlock } from './ProviderPriceBlock'
 import { headingId } from '@/lib/headingId'
 
 type Post = {
@@ -67,6 +68,9 @@ export function PortableTextRenderer({ value, posts }: { value: any[]; posts?: P
       ),
       elselskabShortcode: ({ value }: any) => (
         <ElselskabShortcode ctaSlug={value.ctaSlug} area={value.area ?? 'DK1'} />
+      ),
+      providerPriceBlock: ({ value }: any) => (
+        <ProviderPriceBlock value={value} />
       ),
       image: ({ value }: any) => {
         if (!value?.asset?._ref || !pid) return null

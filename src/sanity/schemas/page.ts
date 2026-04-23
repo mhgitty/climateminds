@@ -177,6 +177,38 @@ export const bodyField = defineField({
         },
       },
     },
+    {
+      type: 'object',
+      name: 'providerPriceBlock',
+      title: 'Prisboks med udbyder',
+      fields: [
+        {
+          name: 'title', title: 'Overskrift (h3)', type: 'string',
+        },
+        {
+          name: 'text', title: 'Tekst', type: 'text', rows: 3,
+        },
+        {
+          name: 'ctaSlug', title: 'Udbyder (ctaSlug)', type: 'string',
+          description: 'F.eks. "norlys", "ewii", "evdk" — matcher ctaSlug i Google Sheets',
+          validation: (r: any) => r.required(),
+        },
+        {
+          name: 'area', title: 'Priszone', type: 'string',
+          options: {
+            list: [{ title: 'DK1 – Vest', value: 'DK1' }, { title: 'DK2 – Øst', value: 'DK2' }],
+            layout: 'radio', direction: 'horizontal',
+          },
+          initialValue: 'DK1',
+        },
+      ],
+      preview: {
+        select: { title: 'title', ctaSlug: 'ctaSlug', area: 'area' },
+        prepare({ title, ctaSlug, area }: any) {
+          return { title: title || 'Prisboks', subtitle: `${ctaSlug || '?'} · ${area || 'DK1'}` }
+        },
+      },
+    },
   ],
 })
 
