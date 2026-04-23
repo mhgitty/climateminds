@@ -7,6 +7,35 @@ export const bodyField = defineField({
   of: [
     {
       type: 'block',
+      // Inline objects insertable within text paragraphs
+      of: [
+        {
+          type: 'object',
+          name: 'elprisInline',
+          title: 'Elpris (inline)',
+          fields: [
+            {
+              name: 'provider', title: 'Udbyder (ctaSlug)', type: 'string',
+              description: 'F.eks. "norlys", "ewii", "evdk" — matcher ctaSlug i Google Sheets',
+              validation: (r: any) => r.required(),
+            },
+            {
+              name: 'area', title: 'Priszone', type: 'string',
+              options: {
+                list: [{ title: 'DK1 – Vest', value: 'DK1' }, { title: 'DK2 – Øst', value: 'DK2' }],
+                layout: 'radio', direction: 'horizontal',
+              },
+              initialValue: 'DK1',
+            },
+          ],
+          preview: {
+            select: { provider: 'provider', area: 'area' },
+            prepare({ provider, area }: any) {
+              return { title: `⚡ ${provider || '?'} (${area || 'DK1'})` }
+            },
+          },
+        },
+      ],
       styles: [
         { title: 'Normal', value: 'normal' },
         { title: 'H2', value: 'h2' },
@@ -119,6 +148,32 @@ export const bodyField = defineField({
         select: { title: 'title', count: 'count' },
         prepare({ title, count }: any) {
           return { title: title || 'Seneste artikler', subtitle: `${count || 4} artikler` }
+        },
+      },
+    },
+    {
+      type: 'object',
+      name: 'elselskabShortcode',
+      title: 'Elselskab kort',
+      fields: [
+        {
+          name: 'ctaSlug', title: 'Udbyder (ctaSlug)', type: 'string',
+          description: 'F.eks. "norlys", "ewii", "evdk" — matcher ctaSlug i Google Sheets',
+          validation: (r: any) => r.required(),
+        },
+        {
+          name: 'area', title: 'Priszone', type: 'string',
+          options: {
+            list: [{ title: 'DK1 – Vest', value: 'DK1' }, { title: 'DK2 – Øst', value: 'DK2' }],
+            layout: 'radio', direction: 'horizontal',
+          },
+          initialValue: 'DK1',
+        },
+      ],
+      preview: {
+        select: { ctaSlug: 'ctaSlug', area: 'area' },
+        prepare({ ctaSlug, area }: any) {
+          return { title: `⚡ ${ctaSlug || 'Udbyder'}`, subtitle: area || 'DK1' }
         },
       },
     },

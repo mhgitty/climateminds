@@ -3,6 +3,8 @@ import { CalloutBlock } from './CalloutBlock'
 import { FaqBlock } from './FaqBlock'
 import { ProsConsBlock } from './ProsConsBlock'
 import { LatestPostsBlock } from './LatestPostsBlock'
+import { ElPrisInline } from './ElPrisInline'
+import { ElselskabShortcode } from './ElselskabShortcode'
 import { headingId } from '@/lib/headingId'
 
 type Post = {
@@ -59,6 +61,13 @@ export function PortableTextRenderer({ value, posts }: { value: any[]; posts?: P
       prosConsBlock: ({ value }: any) => <ProsConsBlock value={value} />,
       latestPostsBlock: ({ value: blockValue }: any) =>
         posts ? <LatestPostsBlock value={blockValue} posts={posts} /> : null,
+      // Shortcodes
+      elprisInline: ({ value }: any) => (
+        <ElPrisInline provider={value.provider} area={value.area ?? 'DK1'} />
+      ),
+      elselskabShortcode: ({ value }: any) => (
+        <ElselskabShortcode ctaSlug={value.ctaSlug} area={value.area ?? 'DK1'} />
+      ),
       image: ({ value }: any) => {
         if (!value?.asset?._ref || !pid) return null
         const ref = value.asset._ref.replace('image-', '').replace(/-(\w+)$/, '.$1')
