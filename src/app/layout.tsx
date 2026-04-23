@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   },
   description: 'Find det billigste elselskab i Danmark. Vi sammenligner priser baseret på den aktuelle spotpris fra alle store udbydere.',
   alternates: { canonical: 'https://climateminds.dk' },
-  icons: { icon: [{ url: '/favicon.png', type: 'image/png' }] },
+  icons: { icon: [{ url: '/favicon.webp', type: 'image/webp' }], apple: '/favicon.webp' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

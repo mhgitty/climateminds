@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export function Footer() {
   const year = new Date().getFullYear()
@@ -7,8 +8,14 @@ export function Footer() {
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div className="footer-grid">
           <div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 700, color: '#111827', marginBottom: '10px' }}>
-              ⚡ Climateminds.dk
+            <div style={{ marginBottom: '12px' }}>
+              <Image
+                src="/logo.webp"
+                alt="Climateminds"
+                height={32}
+                width={180}
+                style={{ height: '32px', width: 'auto', display: 'block' }}
+              />
             </div>
             <p style={{ fontSize: '13.5px', color: '#6b7280', lineHeight: 1.6, maxWidth: '240px' }}>
               Danmarks uafhængige guide til billig og grøn el. Vi sammenligner priser fra alle store elselskaber.
@@ -31,7 +38,7 @@ export function Footer() {
             </div>
           </div>
         </div>
-        <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
           <p style={{ fontSize: '12.5px', color: '#9ca3af' }}>© {year} Climateminds.dk · Priser er vejledende og opdateres løbende</p>
           <p style={{ fontSize: '12px', color: '#d1d5db' }}>Spotpris fra energidataservice.dk</p>
         </div>

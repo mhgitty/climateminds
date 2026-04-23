@@ -1,12 +1,19 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-inner">
         <Link href="/" className="navbar-logo">
-          <span className="navbar-logo-icon">⚡</span>
-          <span className="navbar-logo-text">Climateminds</span>
+          <Image
+            src="/logo.webp"
+            alt="Climateminds"
+            height={36}
+            width={200}
+            style={{ height: '36px', width: 'auto', display: 'block' }}
+            priority
+          />
         </Link>
 
         <nav className="navbar-nav">
