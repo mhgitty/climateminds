@@ -4,11 +4,14 @@ import { PostCard } from '@/components/PostCard'
 import ElselskabCompare from '@/components/ElselskabCompare'
 import { PortableTextRenderer } from '@/components/PortableTextRenderer'
 import { TableOfContents } from '@/components/TableOfContents'
+import { JsonLd } from '@/components/JsonLd'
 import { getElPriserData } from '@/lib/elpriser'
 import { getPosts, getElselskaber, getHomepage } from '@/lib/sanity'
 import type { Metadata } from 'next'
 
 export const revalidate = 1800
+
+const BASE = 'https://climateminds.dk'
 
 const DEFAULT_HERO_HEADING = 'Find den billigste el'
 const DEFAULT_HERO_GREEN = 'i Danmark'
@@ -22,9 +25,24 @@ const DEFAULT_HOW_ITEMS = [
 
 export async function generateMetadata(): Promise<Metadata> {
   const hp = await getHomepage().catch(() => null)
+  const title = hp?.metaTitle || 'Sammenlign elselskaber — find den billigste el i Danmark'
+  const description =
+    hp?.metaDescription ||
+    'Sammenlign priser fra alle store danske elselskaber baseret på den aktuelle spotpris. Opdateret månedligt fra energidataservice.dk.'
   return {
-    title: hp?.metaTitle || 'Sammenlign elselskaber — find den billigste el i Danmark',
-    description: hp?.metaDescription || 'Sammenlign priser fra alle store danske elselskaber baseret på den aktuelle spotpris. Opdateret månedligt fra energidataservice.dk.',
+    title,
+    description,
+    alternates: { canonical: BASE },
+    openGraph: {
+      title,
+      description,
+      url: BASE,
+      type: 'website',
+    },
+    twitter: {
+      title,
+      description,
+    },
   }
 }
 
@@ -54,8 +72,41 @@ export default async function HomePage() {
   const howTitle    = hp?.howItWorksTitle || DEFAULT_HOW_TITLE
   const howItems    = (hp?.howItWorksItems?.length ? hp.howItWorksItems : DEFAULT_HOW_ITEMS) as typeof DEFAULT_HOW_ITEMS
 
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${BASE}/#website`,
+        url: BASE,
+        name: 'Climateminds.dk',
+        description: 'Danmarks uafhængige guide til billig og grøn el',
+        inLanguage: 'da-DK',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: `${BASE}/blog?q={search_term_string}`,
+          },
+          'query-input': 'required name=search_term_string',
+        },
+      },
+      {
+        '@type': 'Organization',
+        '@id': `${BASE}/#organization`,
+        name: 'Climateminds',
+        url: BASE,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${BASE}/logo.webp`,
+        },
+      },
+    ],
+  }
+
   return (
     <>
+      <JsonLd data={websiteSchema} />
       <Navbar />
 
       {/* Hero */}

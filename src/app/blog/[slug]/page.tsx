@@ -4,11 +4,14 @@ import { PortableTextRenderer } from '@/components/PortableTextRenderer'
 import { TableOfContents } from '@/components/TableOfContents'
 import { AuthorMeta } from '@/components/AuthorMeta'
 import { AuthorBio } from '@/components/AuthorBio'
+import { JsonLd } from '@/components/JsonLd'
 import { getPostBySlug, getPosts } from '@/lib/sanity'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
 export const revalidate = 3600
+
+const BASE = 'https://climateminds.dk'
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -16,11 +19,41 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = await getPostBySlug(slug).catch(() => null)
   if (!post) return {}
+  const title = post.metaTitle || post.title
+  const description = post.metaDescription || post.excerpt || ''
+  const canonical = `${BASE}/blog/${slug}`
   return {
-    title: post.metaTitle || post.title,
-    description: post.metaDescription || post.excerpt || '',
-    alternates: { canonical: `https://climateminds.dk/blog/${slug}` },
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: 'article',
+      publishedTime: post.publishedAt,
+      modifiedTime: post.lastUpdated || post.publishedAt,
+      authors: post.author?.name ? [post.author.name] : undefined,
+      ...(post.featuredImage?.asset?.url
+        ? { images: [{ url: post.featuredImage.asset.url, alt: title }] }
+        : {}),
+    },
+    twitter: {
+      title,
+      description,
+      ...(post.featuredImage?.asset?.url
+        ? { images: [post.featuredImage.asset.url] }
+        : {}),
+    },
   }
+}
+
+/** Extract plain-text FAQ items from Portable Text body */
+function extractFaqs(body: any[]): Array<{ question: string; answer: string }> {
+  return (body || [])
+    .filter((b: any) => b._type === 'faqBlock')
+    .flatMap((b: any) => b.items || [])
+    .filter((f: any) => f.question && f.answer)
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -31,8 +64,59 @@ export default async function BlogPostPage({ params }: Props) {
   ])
   if (!post) notFound()
 
+  const canonical = `${BASE}/blog/${slug}`
+  const faqs = post.body ? extractFaqs(post.body) : []
+
+  const jsonLdGraph: object[] = [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Hjem', item: BASE },
+        { '@type': 'ListItem', position: 2, name: 'Guides', item: `${BASE}/blog` },
+        { '@type': 'ListItem', position: 3, name: post.title, item: canonical },
+      ],
+    },
+    {
+      '@type': 'Article',
+      '@id': `${canonical}#article`,
+      headline: post.title,
+      description: post.excerpt || '',
+      url: canonical,
+      datePublished: post.publishedAt,
+      dateModified: post.lastUpdated || post.publishedAt,
+      inLanguage: 'da-DK',
+      author: post.author
+        ? { '@type': 'Person', name: post.author.name }
+        : { '@type': 'Organization', name: 'Climateminds' },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Climateminds',
+        url: BASE,
+        logo: { '@type': 'ImageObject', url: `${BASE}/logo.webp` },
+      },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+      ...(post.featuredImage?.asset?.url
+        ? { image: post.featuredImage.asset.url }
+        : {}),
+    },
+  ]
+
+  if (faqs.length > 0) {
+    jsonLdGraph.push({
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.question,
+        acceptedAnswer: { '@type': 'Answer', text: f.answer },
+      })),
+    })
+  }
+
+  const jsonLd = { '@context': 'https://schema.org', '@graph': jsonLdGraph }
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <Navbar />
 
       {/* Hero header */}

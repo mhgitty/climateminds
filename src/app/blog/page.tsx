@@ -1,13 +1,23 @@
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { PostCard } from '@/components/PostCard'
+import { JsonLd } from '@/components/JsonLd'
 import { getPosts, getCategories } from '@/lib/sanity'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+const BASE = 'https://climateminds.dk'
+
 export const metadata: Metadata = {
   title: 'Guides & artikler om el i Danmark',
   description: 'Læs vores guides om elpriser, elselskaber og grøn energi i Danmark.',
+  alternates: { canonical: `${BASE}/blog` },
+  openGraph: {
+    title: 'Guides & artikler om el i Danmark',
+    description: 'Læs vores guides om elpriser, elselskaber og grøn energi i Danmark.',
+    url: `${BASE}/blog`,
+    type: 'website',
+  },
 }
 
 export const revalidate = 3600
@@ -21,8 +31,18 @@ export default async function BlogPage({ searchParams }: Props) {
     getCategories().catch(() => []),
   ])
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Hjem', item: BASE },
+      { '@type': 'ListItem', position: 2, name: 'Guides & artikler', item: `${BASE}/blog` },
+    ],
+  }
+
   return (
     <>
+      <JsonLd data={breadcrumbSchema} />
       <Navbar />
       <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '40px 24px 32px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
