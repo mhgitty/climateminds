@@ -179,6 +179,55 @@ export const bodyField = defineField({
     },
     {
       type: 'object',
+      name: 'tableBlock',
+      title: 'Tabel',
+      fields: [
+        { name: 'title', title: 'Overskrift (valgfri)', type: 'string' },
+        {
+          name: 'headers',
+          title: 'Kolonneoverskrifter',
+          type: 'array',
+          of: [{ type: 'string' }],
+          description: 'Én overskrift per kolonne — lad stå tom for ingen header-række',
+        },
+        {
+          name: 'rows',
+          title: 'Rækker',
+          type: 'array',
+          of: [{
+            type: 'object',
+            name: 'tableRow',
+            title: 'Række',
+            fields: [
+              {
+                name: 'cells',
+                title: 'Celler',
+                type: 'array',
+                of: [{ type: 'string' }],
+                description: 'Én værdi per kolonne',
+              },
+            ],
+            preview: {
+              select: { cells: 'cells' },
+              prepare({ cells }: any) {
+                return { title: (cells || []).join(' | ') || '(tom række)' }
+              },
+            },
+          }],
+        },
+      ],
+      preview: {
+        select: { title: 'title', headers: 'headers', rows: 'rows' },
+        prepare({ title, headers, rows }: any) {
+          return {
+            title: title || 'Tabel',
+            subtitle: `${(headers || []).length} kolonner · ${(rows || []).length} rækker`,
+          }
+        },
+      },
+    },
+    {
+      type: 'object',
       name: 'providerPriceBlock',
       title: 'Prisboks med udbyder',
       fields: [

@@ -3,6 +3,7 @@ import { CalloutBlock } from './CalloutBlock'
 import { FaqBlock } from './FaqBlock'
 import { ProsConsBlock } from './ProsConsBlock'
 import { LatestPostsBlock } from './LatestPostsBlock'
+import { TableBlock } from './TableBlock'
 import { ElPrisInline } from './ElPrisInline'
 import { ElselskabShortcode } from './ElselskabShortcode'
 import { ProviderPriceBlock } from './ProviderPriceBlock'
@@ -60,6 +61,7 @@ export function PortableTextRenderer({ value, posts }: { value: any[]; posts?: P
       calloutBlock: ({ value }: any) => <CalloutBlock value={value} />,
       faqBlock: ({ value }: any) => <FaqBlock value={value} />,
       prosConsBlock: ({ value }: any) => <ProsConsBlock value={value} />,
+      tableBlock: ({ value }: any) => <TableBlock value={value} />,
       latestPostsBlock: ({ value: blockValue }: any) =>
         posts ? <LatestPostsBlock value={blockValue} posts={posts} /> : null,
       // Shortcodes
