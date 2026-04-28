@@ -1,3 +1,5 @@
+import { ShortcodeText } from './ShortcodeText'
+
 interface TableBlockValue {
   title?: string
   headers?: string[]
@@ -38,7 +40,7 @@ export function TableBlock({ value }: { value: TableBlockValue }) {
                     whiteSpace: 'nowrap',
                     fontSize: '13.5px',
                   }}>
-                    {h}
+                    <ShortcodeText text={h} />
                   </th>
                 ))}
               </tr>
@@ -54,7 +56,7 @@ export function TableBlock({ value }: { value: TableBlockValue }) {
                     verticalAlign: 'top',
                     lineHeight: 1.6,
                   }}>
-                    {cell}
+                    <ShortcodeText text={cell} />
                   </td>
                 ))}
               </tr>
