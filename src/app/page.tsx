@@ -75,41 +75,64 @@ export default async function HomePage() {
   const howTitle    = hp?.howItWorksTitle || DEFAULT_HOW_TITLE
   const howItems    = (hp?.howItWorksItems?.length ? hp.howItWorksItems : DEFAULT_HOW_ITEMS) as typeof DEFAULT_HOW_ITEMS
 
-  const websiteSchema = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'WebSite',
-        '@id': `${BASE}/#website`,
-        url: BASE,
-        name: 'Climateminds.dk',
-        description: 'Danmarks uafhængige guide til billig og grøn el',
-        inLanguage: 'da-DK',
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: {
-            '@type': 'EntryPoint',
-            urlTemplate: `${BASE}/blog?q={search_term_string}`,
-          },
-          'query-input': 'required name=search_term_string',
-        },
+  const pageTitle = hp?.metaTitle || 'Sammenlign elselskaber — find den billigste el i Danmark'
+  const pageDescription = hp?.metaDescription || DEFAULT_INTRO
+
+  // Extract FAQ items from homepage body content
+  const faqs = (hp?.body ?? [])
+    .filter((b: any) => b._type === 'faqBlock')
+    .flatMap((b: any) => b.items ?? [])
+    .filter((f: any) => f.question && f.answer)
+
+  const jsonLdGraph: object[] = [
+    {
+      '@type': 'WebSite',
+      '@id': `${BASE}/#website`,
+      url: BASE,
+      name: 'Climateminds.dk',
+      description: 'Danmarks uafhængige guide til billig og grøn el',
+      inLanguage: 'da-DK',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${BASE}/blog?q={search_term_string}` },
+        'query-input': 'required name=search_term_string',
       },
-      {
-        '@type': 'Organization',
-        '@id': `${BASE}/#organization`,
-        name: 'Climateminds',
-        url: BASE,
-        logo: {
-          '@type': 'ImageObject',
-          url: `${BASE}/logo.webp`,
-        },
-      },
-    ],
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${BASE}/#organization`,
+      name: 'Climateminds',
+      url: BASE,
+      logo: { '@type': 'ImageObject', url: `${BASE}/logo.webp` },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${BASE}/#webpage`,
+      url: BASE,
+      name: pageTitle,
+      description: pageDescription,
+      inLanguage: 'da-DK',
+      isPartOf: { '@id': `${BASE}/#website` },
+      publisher: { '@id': `${BASE}/#organization` },
+    },
+  ]
+
+  if (faqs.length > 0) {
+    jsonLdGraph.push({
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((f: any) => ({
+        '@type': 'Question',
+        name: f.question,
+        acceptedAnswer: { '@type': 'Answer', text: f.answer },
+      })),
+    })
   }
+
+  const jsonLd = { '@context': 'https://schema.org', '@graph': jsonLdGraph }
 
   return (
     <>
-      <JsonLd data={websiteSchema} />
+      <JsonLd data={jsonLd} />
       <Navbar />
 
       {/* Hero */}
