@@ -82,6 +82,14 @@ export const homepageType = defineType({
     // SEO
     defineField({ name: 'metaTitle', title: 'Meta titel', type: 'string', group: 'seo', initialValue: 'Sammenlign elselskaber — find den billigste el i Danmark' }),
     defineField({ name: 'metaDescription', title: 'Meta beskrivelse', type: 'text', rows: 3, group: 'seo', initialValue: 'Sammenlign priser fra alle store danske elselskaber baseret på den aktuelle spotpris. Opdateret månedligt fra energidataservice.dk.' }),
+    defineField({
+      name: 'featuredImage', title: 'OG-billede', type: 'image', group: 'seo',
+      description: 'Billede der vises når siden deles på sociale medier',
+      options: { hotspot: true },
+      fields: [
+        defineField({ name: 'alt', title: 'Alt-tekst', type: 'string', description: 'Beskriv billedet for søgemaskiner og skærmlæsere' }),
+      ],
+    }),
   ],
   preview: {
     select: { title: 'heroHeading' },

@@ -29,6 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description =
     hp?.metaDescription ||
     'Sammenlign priser fra alle store danske elselskaber baseret på den aktuelle spotpris. Opdateret månedligt fra energidataservice.dk.'
+  const img = hp?.featuredImage?.url ? hp.featuredImage : null
   return {
     title,
     description,
@@ -38,10 +39,12 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       url: BASE,
       type: 'website',
+      ...(img ? { images: [{ url: img.url, alt: img.alt || title }] } : {}),
     },
     twitter: {
       title,
       description,
+      ...(img ? { images: [img.url] } : {}),
     },
   }
 }

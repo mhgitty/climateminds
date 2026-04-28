@@ -25,7 +25,9 @@ export async function getPostBySlug(slug: string) {
   return client.fetch(
     `*[_type == "post" && slug.current == $slug][0] {
       _id, title, slug, excerpt, body, publishedAt, lastUpdated, readingTime,
-      featuredImage, metaTitle, metaDescription,
+      "featuredImage": featuredImage { "url": asset->url, alt },
+      "ogImage": ogImage { "url": asset->url, alt },
+      metaTitle, metaDescription,
       category-> { name, slug, emoji },
       author-> { name, bio, linkedin, "imageUrl": image.asset->url }
     }`,
@@ -42,7 +44,8 @@ export async function getCategories() {
 export async function getPageBySlug(slug: string) {
   return client.fetch(
     `*[_type == "page" && slug.current == $slug][0] {
-      _id, title, slug, intro, body, metaTitle, metaDescription
+      _id, title, slug, intro, body, metaTitle, metaDescription,
+      "featuredImage": featuredImage { "url": asset->url, alt }
     }`,
     { slug }
   )
@@ -61,7 +64,8 @@ export async function getHomepage() {
     `*[_type == "homepage" && _id == "homepage"][0] {
       heroHeading, heroGreenText, intro, body,
       howItWorksTitle, showHowItWorks, howItWorksItems,
-      metaTitle, metaDescription
+      metaTitle, metaDescription,
+      "featuredImage": featuredImage { "url": asset->url, alt }
     }`
   )
 }
@@ -70,7 +74,8 @@ export async function getElselskabBySlug(ctaSlug: string) {
   return client.fetch(
     `*[_type == "elselskab" && ctaSlug.current == $ctaSlug][0] {
       _id, name, ctaSlug, logo, affiliateUrl, shortDescription, badges,
-      rating, pros, cons, reviewBody, metaTitle, metaDescription
+      rating, pros, cons, reviewBody, metaTitle, metaDescription,
+      "featuredImage": featuredImage { "url": asset->url, alt }
     }`,
     { ctaSlug }
   )

@@ -22,6 +22,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = post.metaTitle || post.title
   const description = post.metaDescription || post.excerpt || ''
   const canonical = `${BASE}/blog/${slug}`
+  // Prefer a dedicated OG image; fall back to the featured image
+  const img = post.ogImage?.url ? post.ogImage : post.featuredImage?.url ? post.featuredImage : null
   return {
     title,
     description,
@@ -34,16 +36,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       publishedTime: post.publishedAt,
       modifiedTime: post.lastUpdated || post.publishedAt,
       authors: post.author?.name ? [post.author.name] : undefined,
-      ...(post.featuredImage?.asset?.url
-        ? { images: [{ url: post.featuredImage.asset.url, alt: title }] }
-        : {}),
+      ...(img ? { images: [{ url: img.url, alt: img.alt || title }] } : {}),
     },
     twitter: {
       title,
       description,
-      ...(post.featuredImage?.asset?.url
-        ? { images: [post.featuredImage.asset.url] }
-        : {}),
+      ...(img ? { images: [img.url] } : {}),
     },
   }
 }

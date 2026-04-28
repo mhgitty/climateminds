@@ -21,6 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = page.metaTitle || page.title
   const description = page.metaDescription || page.intro || ''
   const canonical = `${BASE}/${slug}`
+  const img = page.featuredImage?.url ? page.featuredImage : null
   return {
     title,
     description,
@@ -30,10 +31,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: canonical,
       type: 'website',
+      ...(img ? { images: [{ url: img.url, alt: img.alt || title }] } : {}),
     },
     twitter: {
       title,
       description,
+      ...(img ? { images: [img.url] } : {}),
     },
   }
 }

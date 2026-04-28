@@ -281,6 +281,14 @@ export const pageType = defineType({
     { ...bodyField, group: 'content' } as any,
     defineField({ name: 'metaTitle', title: 'Meta titel', type: 'string', group: 'seo' }),
     defineField({ name: 'metaDescription', title: 'Meta beskrivelse', type: 'text', rows: 3, group: 'seo' }),
+    defineField({
+      name: 'featuredImage', title: 'OG-billede', type: 'image', group: 'seo',
+      description: 'Billede der vises når siden deles på sociale medier',
+      options: { hotspot: true },
+      fields: [
+        defineField({ name: 'alt', title: 'Alt-tekst', type: 'string', description: 'Beskriv billedet for søgemaskiner og skærmlæsere' }),
+      ],
+    }),
   ],
   preview: {
     select: { title: 'title', subtitle: 'slug.current' },
