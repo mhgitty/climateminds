@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { TableBlockInput } from '../components/TableBlockInput'
 
 export const bodyField = defineField({
   name: 'body',
@@ -181,6 +182,7 @@ export const bodyField = defineField({
       type: 'object',
       name: 'tableBlock',
       title: 'Tabel',
+      components: { input: TableBlockInput },
       fields: [
         { name: 'title', title: 'Overskrift (valgfri)', type: 'string' },
         {
