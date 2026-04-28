@@ -1,12 +1,19 @@
 import { ShortcodeText } from './ShortcodeText'
 
+type ResolvePrice = (provider: string, area: string, format: 'kwh' | 'monthly') => string | null
+
 interface TableBlockValue {
   title?: string
   headers?: string[]
   rows?: Array<{ cells?: string[] }>
 }
 
-export function TableBlock({ value }: { value: TableBlockValue }) {
+interface Props {
+  value: TableBlockValue
+  resolvePrice?: ResolvePrice
+}
+
+export function TableBlock({ value, resolvePrice }: Props) {
   const { title, headers, rows } = value
   const hasHeaders = (headers?.length ?? 0) > 0
 
@@ -40,7 +47,7 @@ export function TableBlock({ value }: { value: TableBlockValue }) {
                     whiteSpace: 'nowrap',
                     fontSize: '13.5px',
                   }}>
-                    <ShortcodeText text={h} />
+                    <ShortcodeText text={h} resolvePrice={resolvePrice} />
                   </th>
                 ))}
               </tr>
@@ -56,7 +63,7 @@ export function TableBlock({ value }: { value: TableBlockValue }) {
                     verticalAlign: 'top',
                     lineHeight: 1.6,
                   }}>
-                    <ShortcodeText text={cell} />
+                    <ShortcodeText text={cell} resolvePrice={resolvePrice} />
                   </td>
                 ))}
               </tr>
