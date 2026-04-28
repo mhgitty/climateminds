@@ -106,6 +106,12 @@ export default async function HomePage() {
       logo: { '@type': 'ImageObject', url: `${BASE}/logo.webp` },
     },
     {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Hjem', item: BASE },
+      ],
+    },
+    {
       '@type': 'WebPage',
       '@id': `${BASE}/#webpage`,
       url: BASE,
