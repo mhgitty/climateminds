@@ -277,6 +277,18 @@ export const pageType = defineType({
   fields: [
     defineField({ name: 'title', title: 'Titel', type: 'string', group: 'content', validation: (r) => r.required() }),
     defineField({ name: 'slug', title: 'Slug', type: 'slug', group: 'content', options: { source: 'title' }, validation: (r) => r.required() }),
+    defineField({
+      name: 'parent',
+      title: 'Overordnet side (valgfri)',
+      type: 'reference',
+      to: [{ type: 'page' }],
+      group: 'content',
+      description: 'Vælg en overordnet side for at lave en nested URL, f.eks. /elselskaber/norlys',
+      options: {
+        filter: '!defined(parent)',
+        disableNew: true,
+      },
+    }),
     defineField({ name: 'intro', title: 'Intro', type: 'text', rows: 3, group: 'content', description: 'Kort tekst der vises under overskriften i hero-sektionen' }),
     { ...bodyField, group: 'content' } as any,
     defineField({ name: 'metaTitle', title: 'Meta titel', type: 'string', group: 'seo' }),

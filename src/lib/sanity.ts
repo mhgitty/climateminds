@@ -43,11 +43,23 @@ export async function getCategories() {
 
 export async function getPageBySlug(slug: string) {
   return client.fetch(
-    `*[_type == "page" && slug.current == $slug][0] {
+    `*[_type == "page" && slug.current == $slug && !defined(parent)][0] {
       _id, title, slug, intro, body, metaTitle, metaDescription,
       "featuredImage": featuredImage { "url": asset->url, alt }
     }`,
     { slug }
+  )
+}
+
+export async function getChildPageBySlug(parentSlug: string, childSlug: string) {
+  return client.fetch(
+    `*[_type == "page" && slug.current == $childSlug && parent->slug.current == $parentSlug][0] {
+      _id, title, slug, intro, body, metaTitle, metaDescription,
+      "featuredImage": featuredImage { "url": asset->url, alt },
+      "parentTitle": parent->title,
+      "parentSlug": parent->slug.current
+    }`,
+    { parentSlug, childSlug }
   )
 }
 

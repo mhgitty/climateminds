@@ -15,8 +15,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       )
       .catch(() => []),
     client
-      .fetch<Array<{ slug: { current: string } }>>(
-        `*[_type == "page" && defined(slug.current)] { slug }`
+      .fetch<Array<{ slug: { current: string }; parentSlug?: string }>>(
+        `*[_type == "page" && defined(slug.current)] {
+          slug,
+          "parentSlug": parent->slug.current
+        }`
       )
       .catch(() => []),
   ])
@@ -33,9 +36,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   const pageUrls: MetadataRoute.Sitemap = pages.map((p) => ({
-    url: `${BASE}/${p.slug.current}`,
+    url: p.parentSlug
+      ? `${BASE}/${p.parentSlug}/${p.slug.current}`
+      : `${BASE}/${p.slug.current}`,
     changeFrequency: 'monthly',
-    priority: 0.5,
+    priority: p.parentSlug ? 0.6 : 0.5,
   }))
 
   return [
