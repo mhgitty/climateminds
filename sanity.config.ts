@@ -26,6 +26,15 @@ export default defineConfig({
                   .schemaType('homepage')
                   .documentId('homepage')
               ),
+            // Singleton: Site Settings
+            S.listItem()
+              .title('⚙️ Sideindstillinger')
+              .id('siteSettings')
+              .child(
+                S.document()
+                  .schemaType('siteSettings')
+                  .documentId('siteSettings')
+              ),
             S.divider(),
             S.listItem()
               .title('⚡ Elselskaber')

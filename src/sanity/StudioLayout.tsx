@@ -5,6 +5,16 @@ export function WideStudioLayout({ renderDefault, ...props }: { renderDefault: (
   return (
     <>
       <style>{`
+        /* ── Full-height dark background ────────────────────────────── */
+        html, body {
+          height: 100%;
+          background: #101112 !important;
+        }
+        #__next, [data-sanity-studio] {
+          min-height: 100vh;
+          background: #101112;
+        }
+
         /* ── Widen document/form panels ────────────────────────────── */
         [data-testid="document-panel-scroller"] > div,
         [data-testid="document-panel-document-view"] > div {

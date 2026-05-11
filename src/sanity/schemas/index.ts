@@ -4,5 +4,6 @@ import { elselskabType } from './elselskab'
 import { authorType } from './author'
 import { categoryType } from './category'
 import { homepageType } from './homepage'
+import { siteSettingsType } from './siteSettings'
 
-export const schemaTypes = [homepageType, postType, authorType, pageType, categoryType, elselskabType]
+export const schemaTypes = [homepageType, siteSettingsType, postType, authorType, pageType, categoryType, elselskabType]
