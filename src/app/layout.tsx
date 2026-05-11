@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   title: {
     default: 'Climateminds — Sammenlign elselskaber i Danmark',
-    template: '%s | Climateminds.dk',
+    template: '%s',
   },
   description:
     'Find det billigste elselskab i Danmark. Vi sammenligner priser baseret på den aktuelle spotpris fra alle store udbydere.',

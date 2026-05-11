@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return {}
   const title = post.metaTitle || post.title
   const description = post.metaDescription || post.excerpt || ''
-  const canonical = `${BASE}/blog/${slug}`
+  const canonical = `${BASE}/blog/${slug}/`
   // Prefer a dedicated OG image; fall back to the featured image
   const img = post.ogImage?.url ? post.ogImage : post.featuredImage?.url ? post.featuredImage : null
   return {
@@ -62,7 +62,7 @@ export default async function BlogPostPage({ params }: Props) {
   ])
   if (!post) notFound()
 
-  const canonical = `${BASE}/blog/${slug}`
+  const canonical = `${BASE}/blog/${slug}/`
   const faqs = post.body ? extractFaqs(post.body) : []
 
   const jsonLdGraph: object[] = [
@@ -70,7 +70,7 @@ export default async function BlogPostPage({ params }: Props) {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Hjem', item: BASE },
-        { '@type': 'ListItem', position: 2, name: 'Guides', item: `${BASE}/blog` },
+        { '@type': 'ListItem', position: 2, name: 'Guides', item: `${BASE}/blog/` },
         { '@type': 'ListItem', position: 3, name: post.title, item: canonical },
       ],
     },

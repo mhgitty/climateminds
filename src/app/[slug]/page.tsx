@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!page) return {}
   const title = page.metaTitle || page.title
   const description = page.metaDescription || page.intro || ''
-  const canonical = `${BASE}/${slug}`
+  const canonical = `${BASE}/${slug}/`
   const img = page.featuredImage?.url ? page.featuredImage : null
   return {
     title,
@@ -46,7 +46,7 @@ export default async function DynamicPage({ params }: Props) {
   const page = await getPageBySlug(slug).catch(() => null)
   if (!page) notFound()
 
-  const canonical = `${BASE}/${slug}`
+  const canonical = `${BASE}/${slug}/`
 
   const jsonLd = {
     '@context': 'https://schema.org',
