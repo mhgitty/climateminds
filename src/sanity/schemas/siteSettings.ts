@@ -1,117 +1,173 @@
 import { defineField, defineType } from 'sanity'
 
+// ── Shared link fields ─────────────────────────────────────────────────────────
+// Pick a page OR an elselskab OR type a custom URL — whichever is set wins.
+const linkFields = [
+  defineField({ name: 'label', title: 'Tekst', type: 'string', validation: (r) => r.required() }),
+  defineField({
+    name: 'pageRef',
+    title: 'Side (vælg fra CMS)',
+    type: 'reference',
+    to: [{ type: 'page' }],
+    description: 'Vælg en side — URL udfyldes automatisk',
+  }),
+  defineField({
+    name: 'elselskabRef',
+    title: 'Elselskab (vælg fra CMS)',
+    type: 'reference',
+    to: [{ type: 'elselskab' }],
+    description: 'Vælg et elselskab — URL udfyldes automatisk',
+  }),
+  defineField({
+    name: 'url',
+    title: 'URL (tilpasset / ekstern)',
+    type: 'string',
+    description: 'Bruges kun hvis du ikke vælger en side eller elselskab ovenfor. F.eks. /blog/ eller https://...',
+  }),
+]
+
+// ── Top-level nav item ─────────────────────────────────────────────────────────
+const navItemFields = [
+  ...linkFields,
+  defineField({ name: 'isHighlighted', title: 'Fremhævet (CTA-knap)', type: 'boolean', initialValue: false }),
+  defineField({
+    name: 'children',
+    title: 'Undermenu',
+    type: 'array',
+    description: 'Tilføj underpunkter for at skabe en dropdown-menu',
+    of: [{
+      type: 'object',
+      name: 'subNavItem',
+      fields: linkFields,
+      preview: {
+        select: { title: 'label', pageRef: 'pageRef.slug.current', elselskabRef: 'elselskabRef.ctaSlug.current', url: 'url' },
+        prepare({ title, pageRef, elselskabRef, url }: any) {
+          return { title, subtitle: pageRef ? `/${pageRef}/` : elselskabRef ? `/elselskaber/${elselskabRef}/` : url }
+        },
+      },
+    }],
+  }),
+]
+
 export const siteSettingsType = defineType({
   name: 'siteSettings',
-  title: 'Sideindstillinger',
+  title: '⚙️ Sideindstillinger',
   type: 'document',
   groups: [
-    { name: 'general', title: 'Generelt' },
-    { name: 'footer', title: 'Footer' },
-    { name: 'social', title: 'Sociale medier' },
+    { name: 'general', title: '⚙️ Generelt' },
+    { name: 'header',  title: '🔝 Header' },
+    { name: 'footer',  title: '🔻 Footer' },
   ],
   fields: [
-    // ─── Generelt ────────────────────────────────────────────────────────────
+    // ── Default author ──────────────────────────────────────────────────────────
     defineField({
-      name: 'siteName',
-      title: 'Sitenavn',
-      type: 'string',
+      name: 'defaultAuthor',
+      title: 'Standard forfatter',
+      type: 'reference',
+      to: [{ type: 'author' }],
       group: 'general',
-      description: 'Bruges i browser-titel og strukturerede data',
-    }),
-    defineField({
-      name: 'siteDescription',
-      title: 'Standard beskrivelse',
-      type: 'text',
-      rows: 3,
-      group: 'general',
-      description: 'Fallback meta-beskrivelse hvis en side ikke har sin egen',
-    }),
-    defineField({
-      name: 'defaultOgImage',
-      title: 'Standard OG-billede',
-      type: 'image',
-      group: 'general',
-      description: 'Bruges når en side ikke har sit eget OG-billede',
-      options: { hotspot: true },
-    }),
-    defineField({
-      name: 'logo',
-      title: 'Logo',
-      type: 'image',
-      group: 'general',
-      options: { hotspot: false },
-    }),
-    defineField({
-      name: 'email',
-      title: 'Kontakt e-mail',
-      type: 'string',
-      group: 'general',
+      description: 'Vises som forfatter-kort nederst på alle artikler og sider',
     }),
 
-    // ─── Footer ──────────────────────────────────────────────────────────────
+    // ── Header ──────────────────────────────────────────────────────────────────
     defineField({
-      name: 'footerText',
-      title: 'Footer tekst',
-      type: 'text',
-      rows: 3,
-      group: 'footer',
-      description: 'Kort tekst der vises i bunden af footer',
-    }),
-    defineField({
-      name: 'footerLinks',
-      title: 'Footer links',
+      name: 'headerNav',
+      title: 'Header navigation',
       type: 'array',
-      group: 'footer',
+      group: 'header',
+      description: 'Elementer i topmenuen. Træk for at ændre rækkefølge.',
       of: [{
         type: 'object',
-        name: 'footerLink',
+        name: 'navItem',
+        fields: navItemFields,
+        preview: {
+          select: {
+            title: 'label',
+            isHighlighted: 'isHighlighted',
+            pageRef: 'pageRef.slug.current',
+            elselskabRef: 'elselskabRef.ctaSlug.current',
+            url: 'url',
+            children: 'children',
+          },
+          prepare({ title, isHighlighted, pageRef, elselskabRef, url, children }: any) {
+            const resolvedUrl = pageRef ? `/${pageRef}/` : elselskabRef ? `/elselskaber/${elselskabRef}/` : url
+            const hasChildren = (children?.length ?? 0) > 0
+            return {
+              title: `${isHighlighted ? '⚡ ' : ''}${hasChildren ? '▾ ' : ''}${title}`,
+              subtitle: resolvedUrl,
+            }
+          },
+        },
+      }],
+    }),
+
+    // ── Footer ──────────────────────────────────────────────────────────────────
+    defineField({
+      name: 'footerTagline',
+      title: 'Footer tagline',
+      type: 'text',
+      rows: 2,
+      group: 'footer',
+      initialValue: 'Danmarks uafhængige guide til billig og grøn el. Vi sammenligner de bedste elselskaber.',
+    }),
+    defineField({
+      name: 'footerColumns',
+      title: 'Footer kolonner',
+      type: 'array',
+      group: 'footer',
+      description: 'Op til 2 kolonner med links.',
+      validation: (r) => r.max(2),
+      of: [{
+        type: 'object',
+        name: 'footerColumn',
         fields: [
-          { name: 'label', title: 'Tekst', type: 'string' },
-          { name: 'href', title: 'URL', type: 'string', description: 'F.eks. /om-os eller https://...' },
+          defineField({ name: 'title', title: 'Kolonnetitel', type: 'string', validation: (r) => r.required() }),
+          defineField({
+            name: 'items',
+            title: 'Links',
+            type: 'array',
+            of: [{
+              type: 'object',
+              name: 'footerLink',
+              fields: linkFields,
+              preview: {
+                select: {
+                  title: 'label',
+                  pageRef: 'pageRef.slug.current',
+                  elselskabRef: 'elselskabRef.ctaSlug.current',
+                  url: 'url',
+                },
+                prepare({ title, pageRef, elselskabRef, url }: any) {
+                  return { title, subtitle: pageRef ? `/${pageRef}/` : elselskabRef ? `/elselskaber/${elselskabRef}/` : url }
+                },
+              },
+            }],
+          }),
         ],
         preview: {
-          select: { title: 'label', subtitle: 'href' },
+          select: { title: 'title', items: 'items' },
+          prepare({ title, items }: any) {
+            return { title, subtitle: `${(items || []).length} links` }
+          },
         },
       }],
     }),
     defineField({
-      name: 'footerDisclaimer',
-      title: 'Disclaimer / Copyright',
+      name: 'footerNote',
+      title: 'Footer bundtekst (venstre)',
       type: 'string',
       group: 'footer',
-      description: 'F.eks. "© 2025 Climateminds.dk — Uafhængig guide til billig el"',
-    }),
-
-    // ─── Sociale medier ──────────────────────────────────────────────────────
-    defineField({
-      name: 'facebook',
-      title: 'Facebook URL',
-      type: 'url',
-      group: 'social',
+      initialValue: '© 2025 Climateminds.dk · Danmarks uafhængige elguide',
     }),
     defineField({
-      name: 'instagram',
-      title: 'Instagram URL',
-      type: 'url',
-      group: 'social',
-    }),
-    defineField({
-      name: 'linkedin',
-      title: 'LinkedIn URL',
-      type: 'url',
-      group: 'social',
-    }),
-    defineField({
-      name: 'x',
-      title: 'X (Twitter) URL',
-      type: 'url',
-      group: 'social',
+      name: 'footerDisclaimer',
+      title: 'Footer bundtekst (højre)',
+      type: 'string',
+      group: 'footer',
+      initialValue: 'Priser opdateres månedligt fra energidataservice.dk',
     }),
   ],
   preview: {
-    select: { title: 'siteName' },
-    prepare({ title }: any) {
-      return { title: title || 'Sideindstillinger' }
-    },
+    prepare() { return { title: 'Sideindstillinger' } },
   },
 })
